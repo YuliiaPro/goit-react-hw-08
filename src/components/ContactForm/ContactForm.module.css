@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    max-width: 350px;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+
+}
+
+.btn {
+    max-width: 150px;
+    padding: 5px 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.space {
+    margin-top: 10px;
+}
+
+
+.error {
+    color: red;
+    font-size: 12px;
+
+}
