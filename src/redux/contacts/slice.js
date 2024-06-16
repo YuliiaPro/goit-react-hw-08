@@ -74,10 +74,9 @@ const contactsSlice = createSlice({
         state.error = true;
       })
       .addCase(changeContact.fulfilled, (state, action) => {
+        const updatedContact = action.payload;
         state.items = state.items.map((item) => {
-          return item.id === state.currentContact.id
-            ? { ...item, name: action.payload, number: action.payload }
-            : item;
+          return item.id === updatedContact.id ? updatedContact : item;
         });
         state.currentContact = null;
         state.loading = false;

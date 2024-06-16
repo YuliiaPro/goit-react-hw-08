@@ -25,7 +25,7 @@ export default function EditForm() {
   const currentContact = useSelector(selectCurrentContact);
 
   const handleSubmit = ({ name, number }, actions) => {
-    dispatch(changeContact(name, number))
+    dispatch(changeContact({ ...currentContact, name, number }))
       .unwrap()
       .then(() => {
         toast.success("Contact successfully changed!", {
