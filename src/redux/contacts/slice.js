@@ -1,6 +1,11 @@
-import { createSelector, createSlice } from "@reduxjs/toolkit";
-import { addContact, deleteContact, fetchContacts } from "./contactsOps";
-import { selectNameFilter } from "./filterSlice";
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  addContact,
+  changeContact,
+  deleteContact,
+  fetchContacts,
+} from "./operations";
+import { logOut } from "../auth/operations";
 
 const contactsSlice = createSlice({
   name: "contacts",
@@ -8,6 +13,12 @@ const contactsSlice = createSlice({
     items: [],
     loading: false,
     error: null,
+    currentContact: null,
+  },
+  reducers: {
+    addCurrentContact: (state, action) => {
+      state.currentContact = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -48,23 +59,32 @@ const contactsSlice = createSlice({
           (item) => item.id !== action.payload.id
         );
         state.loading = false;
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        state.items = [];
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(changeContact.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(changeContact.rejected, (state) => {
+        state.loading = false;
+        state.error = true;
+      })
+      .addCase(changeContact.fulfilled, (state, action) => {
+        state.items = state.items.map((item) => {
+          return item.id === state.currentContact.id
+            ? { ...item, name: action.payload, number: action.payload }
+            : item;
+        });
+        state.currentContact = null;
+        state.loading = false;
       });
   },
 });
 
-export const selectContacts = (state) => state.contacts.items;
-
-export const selectLoading = (state) => state.contacts.loading;
-
-export const selectError = (state) => state.contacts.error;
-
-export const selectFilteredContacts = createSelector(
-  [selectContacts, selectNameFilter],
-  (contacts, nameFilter) => {
-    return contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(nameFilter.toLowerCase())
-    );
-  }
-);
+export const { addCurrentContact } = contactsSlice.actions;
 
 export default contactsSlice.reducer;

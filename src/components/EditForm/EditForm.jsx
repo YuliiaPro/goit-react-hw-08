@@ -1,10 +1,12 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useId } from "react";
 import * as Yup from "yup";
-import css from "./ContactForm.module.css";
+import css from "./EditForm.module.css";
 import toast, { Toaster } from "react-hot-toast";
-import { addContact } from "../../redux/contacts/operations";
+import { selectCurrentContact } from "../../redux/contacts/selectors";
+import { addCurrentContact } from "../../redux/contacts/slice";
+import { changeContact } from "../../redux/contacts/operations";
 
 const FeedbackSchema = Yup.object().shape({
   name: Yup.string()
@@ -17,26 +19,31 @@ const FeedbackSchema = Yup.object().shape({
     .required("Required"),
 });
 
-export default function ContactForm() {
+export default function EditForm() {
   const fieldId = useId();
   const dispatch = useDispatch();
-  const handleSubmit = (values, actions) => {
-    dispatch(addContact(values))
+  const currentContact = useSelector(selectCurrentContact);
+
+  const handleSubmit = ({ name, number }, actions) => {
+    dispatch(changeContact(name, number))
       .unwrap()
       .then(() => {
-        actions.resetForm();
-        toast.success("Contact successfully added!", {
+        toast.success("Contact successfully changed!", {
           icon: "👏",
         });
+        actions.resetForm();
       })
       .catch(() => {
-        toast.error("Failed to add contact!");
+        toast.error("Failed to change contact!");
       });
   };
 
   return (
     <Formik
-      initialValues={{ name: "", number: "" }}
+      initialValues={{
+        name: currentContact.name,
+        number: currentContact.number,
+      }}
       onSubmit={handleSubmit}
       validationSchema={FeedbackSchema}
     >
@@ -50,10 +57,20 @@ export default function ContactForm() {
         </label>
         <Field type="text" name="number" id={`${fieldId}-number`} />
         <ErrorMessage className={css.error} name="number" component="span" />
-
-        <button className={css.btn} type="submit">
-          Add contact
-        </button>
+        <div className={css.btnContainer}>
+          <button className={css.btn} type="submit">
+            Change
+          </button>
+          <button
+            className={css.btn}
+            type="submit"
+            onClick={() => {
+              dispatch(addCurrentContact(null));
+            }}
+          >
+            Cancel
+          </button>
+        </div>
         <Toaster position="top-center" />
       </Form>
     </Formik>

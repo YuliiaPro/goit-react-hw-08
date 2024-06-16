@@ -1,0 +1,15 @@
+
+.link {
+    font-size: 18px;
+        font-weight: 600;
+    margin-left: 10px;
+    text-decoration: none;
+    list-style-type: none;
+    gap: 12px;
+    color: white;
+    font-weight: bold;
+}
+
+.active {
+    text-decoration: underline;
+ }
